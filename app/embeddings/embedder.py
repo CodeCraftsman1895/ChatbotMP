@@ -5,7 +5,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
-HF_API_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction"
 _model = None
 
 def get_hf_token():
