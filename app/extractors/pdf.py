@@ -1,7 +1,7 @@
 import requests
 import tempfile
 import os
-from pdfminer.high_level import extract_text
+# from pdfminer.high_level import extract_text  <-- Moved inside function
 
 def extract_pdf(link: str) -> dict:
     """
@@ -23,6 +23,7 @@ def extract_pdf(link: str) -> dict:
             tmp.write(response.content)
             tmp_path = tmp.name
 
+        from pdfminer.high_level import extract_text
         text = extract_text(tmp_path)
         os.remove(tmp_path)
         return {"content": text, "error": None}

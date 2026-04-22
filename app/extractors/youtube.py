@@ -1,4 +1,4 @@
-from youtube_transcript_api import YouTubeTranscriptApi
+# from youtube_transcript_api import YouTubeTranscriptApi  <-- Moved inside function
 import re
 
 def extract_youtube(link: str) -> dict:
@@ -21,6 +21,7 @@ def extract_youtube(link: str) -> dict:
             return {"content": "", "error": f"Invalid YouTube URL format: {link}"}
         video_id = match.group(1)
         
+        from youtube_transcript_api import YouTubeTranscriptApi
         api = YouTubeTranscriptApi()
         transcript_list = api.list(video_id)
         

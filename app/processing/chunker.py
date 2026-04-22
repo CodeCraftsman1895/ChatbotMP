@@ -1,4 +1,4 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+# from langchain_text_splitters import RecursiveCharacterTextSplitter  <-- Moved inside function
 
 def chunk_text(text, chunk_size=500, overlap=50):
     """Split text into overlapping semantic chunks for embedding/search."""
@@ -9,6 +9,7 @@ def chunk_text(text, chunk_size=500, overlap=50):
         return []
 
     # Semantic chunking using RecursiveCharacterTextSplitter
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=overlap,

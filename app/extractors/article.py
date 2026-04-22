@@ -1,6 +1,6 @@
 import requests
-from readability import Document
-from bs4 import BeautifulSoup
+# from readability import Document  <-- Moved inside function
+# from bs4 import BeautifulSoup    <-- Moved inside function
 import urllib.robotparser
 from urllib.parse import urlparse
 import time
@@ -60,6 +60,9 @@ def extract_article(link: str) -> dict:
             
             response = requests.get(link, headers={'User-Agent': user_agent})
             response.raise_for_status()  # Raise an error for bad status codes
+            
+            from readability import Document
+            from bs4 import BeautifulSoup
             
             doc = Document(response.text)
             html = doc.summary()
