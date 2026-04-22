@@ -1,17 +1,9 @@
 pymongo
 requests
-pdfminer.six
-beautifulsoup4
-readability-lxml
-youtube-transcript-api
 python-dotenv
 requests-cache
 fastapi
 uvicorn[standard]
 slowapi
-langchain-text-splitters
 pinecone
-sentence-transformers
 groq
-pytest
-pytest-mock

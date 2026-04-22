@@ -55,8 +55,12 @@ def embed_texts(texts):
         # Render will NEVER call this, so it stays safe under 512MB RAM!
         if _model is None:
             logger.info("Loading heavy local embedding model (Local Only)...")
-            from sentence_transformers import SentenceTransformer
-            _model = SentenceTransformer('all-MiniLM-L6-v2')
+            try:
+                from sentence_transformers import SentenceTransformer
+                _model = SentenceTransformer('all-MiniLM-L6-v2')
+            except ImportError:
+                logger.error("sentence-transformers library not installed in this environment!")
+                return None
             
         embeddings = _model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
         logger.info(f"Successfully embedded {len(texts)} texts locally")
