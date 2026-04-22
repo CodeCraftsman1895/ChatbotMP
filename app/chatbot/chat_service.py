@@ -6,7 +6,7 @@ from app.embeddings.embedder import embed_texts, embed_query_cloud
 from app.vectorstore.vector_db import get_collection
 from app.vectorstore.vector_db import query
 from app.vectorstore.vector_db import upsert_documents
-from sentence_transformers import CrossEncoder
+# from sentence_transformers import CrossEncoder  <-- Moved inside function to save RAM
 from app.config.observability import time_it
 from app.processing.chunker import chunk_text
 
@@ -19,7 +19,8 @@ def get_cross_encoder():
     global _cross_encoder
     if _cross_encoder is None:
         try:
-            logger.info("Loading Cross-Encoder model...")
+            logger.info("Loading Cross-Encoder model (Local Only)...")
+            from sentence_transformers import CrossEncoder
             _cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512, device='cpu')
         except Exception as e:
             logger.error(f"Failed to load cross-encoder: {e}")
@@ -74,19 +75,21 @@ def _get_relevant_context(query_text, user_id=None, space_id=None, top_k=2):
         if not docs:
             return None
 
-        # Re-Ranking Phase
-        cross_encoder = get_cross_encoder()
-        pairs = [[query_text, doc] for doc in docs]
-        scores = cross_encoder.predict(pairs)
-
-        # Sort documents by score in descending order
-        scored_docs = list(zip(scores, docs))
-        scored_docs.sort(key=lambda x: x[0], reverse=True)
-
-        # Select top_k docs based on reranker
-        best_docs = [doc for score, doc in scored_docs[:top_k]]
-
-        return ' \n'.join(best_docs)
+        # Re-Ranking Phase (Optional: skipped on Render to save 200MB RAM)
+        if not os.getenv("HF_TOKEN"):
+            try:
+                cross_encoder = get_cross_encoder()
+                pairs = [[query_text, doc] for doc in docs]
+                scores = cross_encoder.predict(pairs)
+                scored_docs = list(zip(scores, docs))
+                scored_docs.sort(key=lambda x: x[0], reverse=True)
+                best_docs = [doc for score, doc in scored_docs[:top_k]]
+                return ' \n'.join(best_docs)
+            except Exception as e:
+                logger.warning(f"Re-ranking failed or skipped: {e}. Falling back to standard retrieval.")
+        
+        # Fallback: Just return the top results from vector search without re-ranking
+        return ' \n'.join(docs[:top_k])
     except Exception as e:
         logger.error(f"Error retrieving context: {e}")
         return None
