@@ -2,7 +2,7 @@ import logging
 import os
 from groq import Groq
 
-from app.embeddings.embedder import embed_texts
+from app.embeddings.embedder import embed_texts, embed_query_cloud
 from app.vectorstore.vector_db import get_collection
 from app.vectorstore.vector_db import query
 from app.vectorstore.vector_db import upsert_documents
@@ -38,7 +38,17 @@ def get_groq_client():
 @time_it("Retrieve and Re-rank Context")
 def _get_relevant_context(query_text, user_id=None, space_id=None, top_k=2):
     try:
-        embedding = embed_texts([query_text])[0]
+        # Use cloud embedding for the query if HF_TOKEN is present (saves 500MB RAM on Render)
+        if os.getenv("HF_TOKEN"):
+            embedding = embed_query_cloud(query_text)
+        else:
+            # Fallback to local if no token (useful for local testing)
+            embedding = embed_texts([query_text])[0]
+        
+        if embedding is None:
+            logger.error("Failed to generate embedding for query")
+            return None
+            
         where_clause = {}
         if user_id:
             where_clause['userId'] = user_id
