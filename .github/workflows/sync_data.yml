@@ -31,4 +31,5 @@ jobs:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           API_KEY: ${{ secrets.API_KEY }}
           DB_NAME: ${{ secrets.DB_NAME }}
+          PYTHONPATH: .
         run: python app/sync.py
