@@ -24,6 +24,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-sync.txt
 
+      - name: Debug File Structure
+        run: |
+          pwd
+          ls -la
+          ls -la app/
+          ls -la app/db/ || echo "app/db/ not found!"
+          
       - name: Run Sync Script
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
